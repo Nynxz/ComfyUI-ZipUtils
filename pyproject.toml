@@ -1,6 +1,6 @@
 [project]
 name = "comfyui-nynxz-zip-utils"
-version = "0.0.1"
+version = "0.0.2"
 description = "Utilities to manage zips and directories"
 authors = [{ name = "Nynxz", email = "contact@nynxz.com" }]
 readme = "README.md"
