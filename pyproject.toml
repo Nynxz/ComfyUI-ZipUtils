@@ -1,0 +1,28 @@
+[project]
+name = "comfyui-nynxz-zip-utils"
+version = "0.0.1"
+description = "Utilities to manage zips and directories"
+authors = [{ name = "Nynxz", email = "contact@nynxz.com" }]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+classifiers = []
+dependencies = []
+dynamic = ["dependencies"]
+
+
+[project.urls]
+Repository = "https://github.com/nynxz/ComfyUI-ZipUtils"
+BugTracker = "https://github.com/nynxz/ComfyUI-ZipUtils/issues"
+Documentation = "https://github.com/nynxz/ComfyUI-ZipUtils/wiki"
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.comfy]
+PublisherId = "nynxz"
+DisplayName = "Nynxz's Zip Utilities"
+Icon = "https://avatars.githubusercontent.com/u/60878743?v=4"
+Tags = []
+Repository = "https://github.com/nynxz/ComfyUI-ZipUtils"
+
