@@ -9,11 +9,15 @@ import numpy as np
 from PIL import Image, ImageSequence, ImageOps
 import zipfile
 
-from custom_nodes.nynxz_zip_utils.utils.zip import handle_7z, handle_dir, handle_zip
+from custom_nodes.nynxz_zip_utils.utils.zip import (
+    ZipLoaderInfoType,
+    handle_7z,
+    handle_dir,
+    handle_zip,
+)
 
 
 class LoadZipNode(io.ComfyNode):
-
     @classmethod
     def define_schema(cls) -> io.Schema:
         return io.Schema(
@@ -33,45 +37,56 @@ class LoadZipNode(io.ComfyNode):
                 io.Int.Input("max_images", default=10, min=0, max=1000),
             ],
             outputs=[
-                io.Image.Output(
-                    id="images", display_name="Image Batch"),
+                io.Image.Output(id="images", display_name="Image Batch"),
                 io.String.Output(
-                    id="filenames", display_name="Filenames (one per line)"),
+                    id="filenames", display_name="Filenames (one per line)"
+                ),
                 io.Int.Output(id="count", display_name="Image Count"),
-            ]
+                ZipLoaderInfoType.Output(id="zip_info", display_name="zip_info"),
+            ],
         )
 
     @classmethod
-    def execute(cls, path, sorting_method="name", reverse_order=True, max_images=10, width=512, height=512):
+    def execute(
+        cls,
+        path,
+        sorting_method="name",
+        reverse_order=True,
+        max_images=10,
+        width=512,
+        height=512,
+    ):
         tensors = []
         names = []
+        info = None
         target_size = (width, height)
         path = Path(path.strip())
-        if path.suffix.lower() == ".zip" or path.suffix.lower() == '.7z':
+        if path.suffix.lower() == ".zip" or path.suffix.lower() == ".7z":
             if path.suffix.lower() == ".7z":
-                (tensors, names) = handle_7z(
-                    path, max_images, sorting_method, reverse_order)
+                (tensors, names, info) = handle_7z(
+                    path, max_images, sorting_method, reverse_order
+                )
             else:
-                (tensors, names) = handle_zip(
-                    path, max_images, sorting_method, reverse_order)
+                (tensors, names, info) = handle_zip(
+                    path, max_images, sorting_method, reverse_order
+                )
         else:
-            (tensors, names) = handle_dir(
-                path, max_images, sorting_method, reverse_order)
+            (tensors, names, info) = handle_dir(
+                path, max_images, sorting_method, reverse_order
+            )
 
         images = []
         for img in tensors:
             img.thumbnail(target_size, Image.Resampling.LANCZOS)
             bg = Image.new("RGBA", target_size, (0, 0, 0, 0))
-            offset = ((target_size[0] - img.width) // 2,
-                      (target_size[1] - img.height) // 2)
+            offset = (
+                (target_size[0] - img.width) // 2,
+                (target_size[1] - img.height) // 2,
+            )
             bg.paste(img, offset)
 
-            arr = np.array(bg).astype(np.float32) / 255.0          # normalize
+            arr = np.array(bg).astype(np.float32) / 255.0  # normalize
             tensor = torch.from_numpy(arr)
             images.append(tensor)
 
-        return io.NodeOutput(
-            images,
-            "\n".join(names),
-            len(names),
-        )
+        return io.NodeOutput(images, "\n".join(names), len(names), info)
