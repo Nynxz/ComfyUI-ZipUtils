@@ -42,43 +42,6 @@ class LoadZipNode(io.ComfyNode):
         )
 
     @classmethod
-    def handle_zip(cls, zip_path: Path, max_images: int):
-        output_images = []
-        successful_names = []
-        w, h = None, None
-        with zipfile.ZipFile(zip_path, 'r') as z:
-            image_filenames = [
-                name for name in z.namelist()
-                if name.lower().endswith(('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.gif', '.tiff', '.avif'))
-            ]
-            if max_images > 0:
-                image_filenames = image_filenames[:max_images]
-
-            for name in image_filenames:
-                try:
-                    with z.open(name) as file:
-                        img = Image.open(file).convert("RGB")
-                except Exception as e:
-                    print(
-                        f"[GalleryLoader] Failed to load {name} from zip: {e}")
-                    continue
-
-                for frame in ImageSequence.Iterator(img):
-                    frame = ImageOps.exif_transpose(frame)
-                    frame = frame.convert("RGB")
-                    if w is None and h is None:
-                        w, h = frame.size
-                    if frame.size != (w, h):
-                        continue
-
-                    np_frame = np.array(frame).astype(np.float32) / 255.0
-                    torch_frame = torch.from_numpy(np_frame)  # (H, W, C)
-                    output_images.append(torch_frame)
-                    successful_names.append(Path(name).name)
-
-        return output_images, successful_names
-
-    @classmethod
     def execute(cls, path, sorting_method="name", reverse_order=True, max_images=10, width=512, height=512):
         tensors = []
         names = []
