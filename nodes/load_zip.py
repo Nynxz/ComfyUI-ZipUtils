@@ -38,11 +38,8 @@ class LoadZipNode(io.ComfyNode):
             ],
             outputs=[
                 io.Image.Output(id="images", display_name="Image Batch"),
-                io.String.Output(
-                    id="filenames", display_name="Filenames (one per line)"
-                ),
-                io.Int.Output(id="count", display_name="Image Count"),
-                ZipLoaderInfoType.Output(id="zip_info", display_name="zip_info"),
+                ZipLoaderInfoType.Output(
+                    id="zip_info", display_name="zip_info"),
             ],
         )
 
@@ -89,4 +86,4 @@ class LoadZipNode(io.ComfyNode):
             tensor = torch.from_numpy(arr)
             images.append(tensor)
 
-        return io.NodeOutput(images, "\n".join(names), len(names), info)
+        return io.NodeOutput(images, info)
