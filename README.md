@@ -1,5 +1,7 @@
 # Zip Utils
 
+[![](https://img.shields.io/badge/ComfyUI-blue.svg?&color=0f2ee0)](https://registry.comfy.org/publishers/nynxz/nodes/comfyui-nynxz-zip-utils)
+
 Load 7z and zip files!
 
 ## Requirements
